@@ -1,0 +1,6 @@
+on: repository_dispatch
+jobs:
+  my_first_job:
+    name: My first job
+    steps:
+      - run: echo "ok"
