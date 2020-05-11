@@ -1,14 +1,5 @@
 on: repository_dispatch
 
-x-repo-dispatch:
-  - title: My custom repo dispatch
-    event_type: todo
-  - title: Other custom dispatch
-    event_type:
-      - foo
-      - bar
-    
-
 jobs:
   my_first_job:
     runs-on: ubuntu-latest
