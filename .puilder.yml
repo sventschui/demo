@@ -2,24 +2,28 @@ dispatches:
   - title: Demo dispatch config 1
     event_type: todo
     fields:
-      - name: Demo Textfield
+      - label: Demo Textfield
+        name: demo-textfield
         type: text
-      - name: Demo Select
+      - label: Demo Select
+        name: demo-select
         type: select
         items:
-          - name: Foo
+          - label: Foo
             value: foo
-          - name: Bar
+          - label: Bar
             value: bar
   - title: Demo dispatch config 2
     event_type: todo
     fields:
-      - name: branch
-        type: branch
-      - name: demo
+      - label: Demo Textfield
+        name: demo-textfield
+        type: text
+      - label: Demo Select
+        name: demo-select
         type: select
         items:
-          - name: Foo
+          - label: Foo
             value: foo
-          - name: Bar
+          - label: Bar
             value: bar
