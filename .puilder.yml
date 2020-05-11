@@ -1,5 +1,17 @@
 dispatches:
-  - title: Demo dispatch
+  - title: Demo dispatch config 1
+    event_type: todo
+    fields:
+      - name: branch
+        type: branch
+      - name: demo
+        type: select
+        items:
+          - name: Foo
+            value: foo
+          - name: Bar
+            value: bar
+  - title: Demo dispatch config 2
     event_type: todo
     fields:
       - name: branch
