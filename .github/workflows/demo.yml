@@ -22,6 +22,11 @@ jobs:
             echo "Branch ${{ github.event.client_payload.branch }} checked out with SHA $(git rev-parse HEAD) but expected ${{ github.event.client_payload.latest_commit_sha }}"
             exit 1
           fi
+          
+      - name: git config
+        run: |
+          git config --global user.email "sventschui@gmail.com"
+          git config --global user.name "prelease"
 
       - run: npm version ${{ github.event.client_payload.version }}
         
