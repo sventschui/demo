@@ -5,28 +5,41 @@ jobs:
     runs-on: ubuntu-latest
     name: My first job
     steps:
-      - run: echo "ok"
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
+      - uses: actions/checkout@v2
+        with:
+          # The branch, tag or SHA to checkout. When checking out the repository that
+          # triggered a workflow, this defaults to the reference or SHA for that event.
+          # Otherwise, defaults to `master`.
+          ref: '${{ github.event.client_payload.branch }}'
+          
+      - name: assert on correct commit
+        run: |
+          if [[ "$(git rev-parse HEAD)" != "${{ github.event.client_payload.latest_commit_sha }}" ]]; then
+            echo "Branch ${{ github.event.client_payload.branch }} checked out with SHA $(git rev-parse HEAD) but expected ${{ github.event.client_payload.latest_commit_sha }}"
+            exit 1
+          fi
+      
+      - run: git tag ${{ github.event.client_payload.version }}
+
+      - run: npm version from-git
+      
+      - run: npm pack
+      
+      - run: git push origin refs/tags/${{ github.event.client_payload.version }}
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          JOB_CONTEXT: ${{ toJson(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.event.client_payload.version }}
+          release_name: Release ${{ github.event.client_payload.version }}
+          body: ${{ github.event.client_payload.changelog }}
+          draft: false
+          prerelease: false
+        
