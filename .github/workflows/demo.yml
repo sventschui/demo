@@ -23,15 +23,16 @@ jobs:
             exit 1
           fi
 
-      - run: npm version --no-git-tag-version ${{ github.event.client_payload.version }}
-      
-      - run: git tag ${{ github.event.client_payload.version }}
+      - run: npm version ${{ github.event.client_payload.version }}
         
       - run: npm pack
+
+      - name: Find git tag
+        run: echo "::set-env name=PRELEASE_GIT_TAG::$(cat package.json | jq -r '["v",.version]|join("")')"
+      
+      - run: git push origin refs/tags/${{ env.PRELEASE_GIT_TAG }}
       
       - run: git push origin ${{ github.event.client_payload.branch }}
-      
-      - run: git push origin refs/tags/${{ github.event.client_payload.version }}
         
       - name: Create Release
         id: create_release
@@ -39,8 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.event.client_payload.version }}
-          release_name: Release ${{ github.event.client_payload.version }}
+          tag_name: ${{ env.PRELEASE_GIT_TAG }}
+          release_name: ${{ github.event.client_payload.title }}
           body: ${{ github.event.client_payload.changelog }}
           draft: false
           prerelease: false
